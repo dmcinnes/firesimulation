@@ -66,7 +66,8 @@ window.main = (function() {
       setInputValuesFromObject(fire);
     }
 
-    $(document).on("keydown", function() {
+    $(document).on("keyup", function(e) {
+      e.preventDefault();
       if (fire) {
         fire.boost();
       }
