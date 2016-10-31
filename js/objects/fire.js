@@ -125,8 +125,8 @@
               d[idx + 2] = color[2];
               d[idx + 3] = color[3];
             }
+            this.tmpCtx.putImageData(imageData, 0, 0);
           }
-          this.tmpCtx.putImageData(imageData, 0, 0);
           ctx.drawImage(this.tmpCtx.canvas, this.x, this.y, this.width * b, this.height * b);
         }
       },

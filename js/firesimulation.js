@@ -66,7 +66,7 @@ window.main = (function() {
       setInputValuesFromObject(fire);
     }
 
-    $("#boostbutton").on("mousedown", function() {
+    $(document).on("keydown", function() {
       if (fire) {
         fire.boost();
       }

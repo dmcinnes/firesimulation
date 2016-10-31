@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 /*global CB document setTimeout */
-var WAITMS_RUN = 1000 / 60;
+var WAITMS_RUN = 1000 / 30;
 var WAITMS_PAUSE = 200;
 
 /**
@@ -24,32 +24,40 @@ CB.frameloop = function(ctx, mainobj, ctrl, fpsfunc) {
     });
   }
 
-  animate = function() {
-    var curTs = new Date() - 0, diff = curTs - lastTs, report = "", logStr;
-    setTimeout(animate, pause ? WAITMS_PAUSE : WAITMS_RUN);
-    lastTs = curTs;
-    s = s + diff;
-    frames++;
-    if (s >= 1000) {
-      if (mainobj.report) {
-        report = mainobj.report();
-      }
-      logStr = "FPS: " + frames + (report ? ", " + report : "");
-      if (ctrl) {
-        ctrl.showLog(logStr);
-      }
-      if (fpsfunc) {
-        fpsfunc(frames);
-      }
-      s = 0;
-      frames = 0;
+  animate = function(curTs) {
+    var diff = curTs - lastTs, report, logStr;
+    // if we're in the background for too long we don't want to break
+    // down when we restart
+    if (diff > 1000) {
+      diff = 100;
     }
-    if (!pause) {
-      mainobj.tick(ctx, diff);
+    if (diff > pause ? WAITMS_PAUSE : WAITMS_RUN) {
+      s = s + diff;
+      frames++;
+      if (s >= 1000) {
+        if (mainobj.report) {
+          report = mainobj.report();
+        }
+        if (ctrl) {
+          logStr = "FPS: " + frames + (report ? ", " + report : "");
+          ctrl.showLog(logStr);
+        }
+        if (fpsfunc) {
+          fpsfunc(frames);
+        }
+        s = 0;
+        frames = 0;
+      }
+
+      if (!pause) {
+        mainobj.tick(ctx, diff);
+      }
+      if (mainobj.draw) {
+        mainobj.draw(ctx);
+      }
+      lastTs = curTs;
     }
-    if (mainobj.draw) {
-      mainobj.draw(ctx);
-    }
+    requestAnimationFrame(animate);
   };
 
   animate();
